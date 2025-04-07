@@ -1,7 +1,14 @@
 <script setup lang="ts">
+import ProjectMilestoneStepper from '~/components/ProjectMilestoneStepper.vue';
 import type { OsTask } from '~/types';
 
 const { path } = useRoute();
+
+const milestoneSteps = ['Discovery', 'Design', 'Development', 'Testing', 'Launch'];
+
+// function getMilestoneIndex(step: string) {
+// 	return milestoneSteps.indexOf(step);
+// }
 
 const { data: projects, error } = await useAsyncData(
 	path,
@@ -12,6 +19,7 @@ const { data: projects, error } = await useAsyncData(
 					'id',
 					'name',
 					'due_date',
+					'current_milestone',
 					{
 						tasks: ['id', 'name', 'status', 'due_date'],
 					},
@@ -97,6 +105,7 @@ const projectsShown = computed(() => {
 			id: project.id,
 			name: project.name,
 			due_date: project.due_date,
+			current_milestone: project.current_milestone,
 			tasks: tasks.map((task) => {
 				return {
 					isComplete: task.status === 'completed',
@@ -145,35 +154,11 @@ const projectsShown = computed(() => {
 					<VText size="xs">{{ getFriendlyDate(row.due_date) }}</VText>
 					<VText size="xs" text-color="light">{{ getRelativeTime(row.due_date) }}</VText>
 				</template>
+
 				<template #milestones-data="{ row }">
-					<ul class="flex items-center">
-						<template v-for="({ isComplete, isCurrent, icon }, i) in row.tasks" :key="i">
-							<li :class="[i !== row.tasks.length - 1 ? '' : '', 'relative']">
-								<div
-									:class="{
-										'border-primary border-dashed h-10 w-10 border-2': isCurrent && !isComplete,
-										'bg-primary w-5 h-5': isComplete,
-										'dark:border-gray-700 border-gray-300 border-2 w-5 h-5': !isCurrent && !isComplete,
-									}"
-									class="relative flex items-center justify-center flex-shrink-0 rounded-card"
-								>
-									<UIcon v-if="isComplete" name="i-heroicons-check" class="w-4 text-white" />
-									<UIcon
-										v-else-if="icon && isCurrent"
-										:name="icon"
-										class="fill-current"
-										:class="{
-											'text-primary w-5 h-5': isCurrent,
-										}"
-									/>
-								</div>
-							</li>
-							<li v-if="i !== row.tasks.length - 1" class="w-3" aria-hidden="true">
-								<div class="h-0.5 w-full" :class="[isComplete ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700']" />
-							</li>
-						</template>
-					</ul>
+					<ProjectMilestoneStepper :steps="milestoneSteps" :current-step="row.current_milestone" size="sm" />
 				</template>
+
 				<template #actions-data="{ row }">
 					<UButton
 						:to="`/portal/projects/${row.id}`"

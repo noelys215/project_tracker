@@ -44,7 +44,9 @@ export default defineNuxtConfig({
 	runtimeConfig: {
 		public: {
 			siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+			directusUrl: process.env.DIRECTUS_URL || 'http://localhost:8055',
 		},
+		directusServerToken: process.env.DIRECTUS_SERVER_TOKEN,
 	},
 
 	// Directus Configuration

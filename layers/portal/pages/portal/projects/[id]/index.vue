@@ -1,7 +1,14 @@
 <script setup lang="ts">
+import ProjectMilestoneStepper from '~/components/ProjectMilestoneStepper.vue';
 import type { OsProject, OsTask } from '~/types';
 
 const { path, params } = useRoute();
+
+const milestoneSteps = ['Discovery', 'Design', 'Development', 'Testing', 'Launch'];
+
+function getMilestoneIndex(step: string) {
+	return milestoneSteps.indexOf(step);
+}
 
 const {
 	data: project,
@@ -12,6 +19,7 @@ const {
 		readItem('os_projects', params.id as string, {
 			fields: [
 				'*',
+				'current_milestone',
 				{
 					organization: ['id', 'name', 'logo'],
 					owner: ['id', 'first_name', 'last_name', 'email', 'avatar'],
@@ -69,11 +77,13 @@ const milestones = computed(() => {
 </script>
 <template>
 	<div id="overview" class="grid lg:grid-cols-2">
+		<!-- Inside <template> -->
 		<UCard class="mt-6 space-y-4 lg:col-span-2">
 			<!-- Milestones -->
 			<TypographyHeadline content="Milestones" size="xs" />
-			<PortalProjectMilestones :steps="milestones as any" />
+			<ProjectMilestoneStepper :steps="milestoneSteps" :current-step="project?.current_milestone" size="lg" />
 		</UCard>
+
 		<section class="px-4 py-3 mt-8 space-y-4">
 			<TypographyHeadline content="Description" size="xs" />
 			<TypographyProse v-if="project?.description" :content="project?.description" />
@@ -105,7 +115,7 @@ const milestones = computed(() => {
 		</UCard>
 		<div class="px-4 py-3 mt-12 lg:col-span-2">
 			<TypographyHeadline content="Updates" size="xs" />
-			<PortalProjectActivity />
+			<PortalProjectActivity :item="project?.id" collection="os_projects" />
 		</div>
 	</div>
 </template>
