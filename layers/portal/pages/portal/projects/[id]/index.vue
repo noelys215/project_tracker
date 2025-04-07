@@ -50,6 +50,8 @@ const {
 	);
 });
 
+console.log('Project data:', project);
+
 const { fileUrl } = useFiles();
 
 const milestones = computed(() => {
@@ -115,7 +117,7 @@ const milestones = computed(() => {
 		</UCard>
 		<div class="px-4 py-3 mt-12 lg:col-span-2">
 			<TypographyHeadline content="Updates" size="xs" />
-			<PortalProjectActivity :item="project?.id" collection="os_projects" />
+			<PortalProjectActivity :updates="project?.updates" />
 		</div>
 	</div>
 </template>
